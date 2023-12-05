@@ -57,7 +57,7 @@ public class Day01 : BaseDay
             ReadOnlySpan<char> span = line.AsSpan();
             bool firstFound = false;
             int? last = null;
-            for(int i = 0; i < line.Length; i++)
+            for (int i = 0; i < line.Length; i++)
             {
                 var c = span[i];
                 if (char.IsDigit(c))
@@ -71,7 +71,7 @@ public class Day01 : BaseDay
                 }
                 else
                 {
-                    foreach(var key in textual.Keys)
+                    foreach (var key in textual.Keys)
                     {
                         if (span[i..].StartsWith(key))
                         {
@@ -84,9 +84,8 @@ public class Day01 : BaseDay
                         }
                     }
                 }
-
             }
-           
+
             sum += (last.Value);
 
         }
