@@ -7,7 +7,8 @@ else if (args.Length == 1 && args[0].Contains("all", StringComparison.CurrentCul
     await Solver.SolveAll(opt =>
     {
         opt.ShowConstructorElapsedTime = true;
-        opt.ShowTotalElapsedTimePerDay = true;
+        opt.ShowTotalElapsedTimePerDay = false;
+        opt.ElapsedTimeFormatSpecifier = "F3";
     });
 }
 else

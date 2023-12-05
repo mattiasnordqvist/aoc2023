@@ -1,0 +1,15 @@
+{
+  "profiles": {
+    "WSL": {
+      "commandName": "WSL2",
+      "distributionName": ""
+    },
+    "Solve All": {
+      "commandName": "Project",
+      "commandLineArgs": "all"
+    },
+    "Solve Latest": {
+      "commandName": "Project"
+    }
+  }
+}
