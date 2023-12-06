@@ -1,13 +1,8 @@
-﻿namespace AdventOfCode;
-public class Day01 : BaseDay
+﻿using System.Diagnostics;
+
+namespace AdventOfCode;
+public class Day01 : MyBaseDay
 {
-    private readonly string _input;
-
-    public Day01()
-    {
-        _input = File.ReadAllText(InputFilePath);
-    }
-
     public override async ValueTask<string> Solve_1()
     {
         var lines = _input.Split('\n');
@@ -32,6 +27,7 @@ public class Day01 : BaseDay
             sum += (last.Value - 48);
 
         }
+        Debug.Assert(sum == 54601);
         return sum.ToString();
     }
 
@@ -88,6 +84,7 @@ public class Day01 : BaseDay
             sum += (last.Value);
 
         }
+        Debug.Assert(sum == 54078);
         return ValueTask.FromResult(sum.ToString());
     }
 }

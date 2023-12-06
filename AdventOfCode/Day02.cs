@@ -1,6 +1,6 @@
 ﻿namespace AdventOfCode;
 
-public class Day02 : BaseDay
+public class Day02 : MyBaseDay
 {
     public override ValueTask<string> Solve_1()
     {

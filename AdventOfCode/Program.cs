@@ -7,9 +7,9 @@ internal class Program
     private static async Task Main(string[] args)
     {
         //var s = new Stopwatch();
-        //var input = File.ReadAllText(@"C:\Users\mnor\source\repos\aoc2023\AdventOfCode\Inputs\05.txt");
+        //var input = File.ReadAllText(@"C:\Users\mnor\source\repos\aoc2023\AdventOfCode\Inputs\06.txt");
         //s.Start();
-        //await new Day05(input).Solve_2();
+        //await new Day06(input).Solve_2();
         //s.Stop();
         //Console.WriteLine(s.Elapsed.TotalMilliseconds.ToString());
         //return;

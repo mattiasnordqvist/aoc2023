@@ -1,18 +1,10 @@
 ﻿
+using System.Diagnostics;
+
 namespace AdventOfCode;
 
-public class Day05 : BaseDay
+public class Day05 : MyBaseDay
 {
-    private readonly string _input;
-
-    public Day05()
-    {
-        _input = File.ReadAllText(InputFilePath);
-    }
-    public Day05(string input)
-    {
-        _input = input;
-    }
     public override ValueTask<string> Solve_1()
     {
         var lines = _input.Zplit();
@@ -55,6 +47,7 @@ public class Day05 : BaseDay
                 min = value;
             }
         }
+        Debug.Assert(min == 84470622);
         return ValueTask.FromResult(min.ToString());
 
     }
@@ -110,6 +103,7 @@ public class Day05 : BaseDay
             }
         }
 
+        Debug.Assert(min == 26714516);
         return min.ToString();
 
         (string to, (long dest, Range range) map)[] FindMapsOrdered(string from)
@@ -166,28 +160,7 @@ public class Day05 : BaseDay
                     newGroups.Add(overlap.ReMap(range.map.range.i, range.map.dest));
                 }
             }
-
-            //if(currentGroup.e <= range.map.range.i)
-            //{
-            //    continue;
-            //}
-            //if(currentGroup.i > range.map.range.e)
-            //{
-            //    continue;
-            //}
-            //if(currentGroup)
-            //if (currentGroup.i < range.map.range.i)
-            //{
-            //    newGroups.Add(Range.From(currentGroup.i, Math.Min(currentGroup.e, range.map.range.e)));
-            //}
-            //newGroups.Add(Range.From(currentGroup.i, Math.Min(currentGroup.e, range.map.range.e)).ReMap(range.map.range.i, range.map.dest));
-            //currentGroup = Range.From(Math.Min(currentGroup.e, range.map.range.e) + 1, currentGroup.e);
-            //if (currentGroup.l <= 0) break;
         }
-        //if (currentGroup.l > 0)
-        //{
-        //    newGroups.Add(currentGroup);
-        //}
         return [..newGroups, ..currentGroups];
     }
 }

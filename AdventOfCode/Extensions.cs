@@ -11,6 +11,14 @@ public static class Extensions
     public static long l(this string input) => long.Parse(input);
     public static string[] Zplit(this string text, string by = "\n")
     {
-        return text.Split(by, StringSplitOptions.TrimEntries);
+        if(by == "\n")
+        {
+            return text.Split(by, StringSplitOptions.TrimEntries);
+        }
+        else
+        {
+            return text.Split(by, StringSplitOptions.TrimEntries | StringSplitOptions.RemoveEmptyEntries);
+        }
+        
     }
 }

@@ -12,7 +12,7 @@
   </ItemGroup>
 
   <PropertyGroup>
-    <NoWarn>S101</NoWarn>
+    <NoWarn>S101;CS1998</NoWarn>
   </PropertyGroup>
 
   <ItemGroup>
