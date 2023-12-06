@@ -7,7 +7,7 @@ public class Day05 : MyBaseDay
 {
     public override ValueTask<string> Solve_1()
     {
-        var lines = _input.Zplit();
+        var lines = Input.Zplit();
         var seeds = lines[0].Zplit(":")[1].Zplit(" ").la();
         ListDictionary<string, (string to, (long dest, long source, long length) map)> maps = [];
         for (int l = 2; l < lines.Length;)
@@ -68,7 +68,7 @@ public class Day05 : MyBaseDay
 
     public override async ValueTask<string> Solve_2()
     {
-        var lines = _input.Zplit();
+        var lines = Input.Zplit();
         var seedsArray = lines[0].Zplit(":")[1].Zplit(" ").la();
 
         var seeds = new Range[seedsArray.Length / 2];

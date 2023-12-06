@@ -13,7 +13,7 @@ public class Day04 : MyBaseDay
 
     public override ValueTask<string> Solve_2()
     {
-        var lines = _input.Zplit();
+        var lines = Input.Zplit();
         var cards = lines.Select(CreateCard).ToList();
         for (int i = 0; i < cards.Count; i++)
         {

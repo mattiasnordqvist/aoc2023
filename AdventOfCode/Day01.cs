@@ -5,7 +5,7 @@ public class Day01 : MyBaseDay
 {
     public override async ValueTask<string> Solve_1()
     {
-        var lines = _input.Split('\n');
+        var lines = Input.Split('\n');
         var sum = 0;
         foreach (var line in lines)
         {
@@ -23,6 +23,10 @@ public class Day01 : MyBaseDay
                         firstFound = true;
                     }
                 }
+            }
+            if(last == null)
+            {
+                throw new Exception("last expected to not be null at this time");
             }
             sum += (last.Value - 48);
 
@@ -45,7 +49,7 @@ public class Day01 : MyBaseDay
             {"eight", 8 },
             {"nine", 9 }
         };
-        var lines = _input.Split('\n');
+        var lines = Input.Split('\n');
         var sum = 0;
         foreach (var line in lines)
         {

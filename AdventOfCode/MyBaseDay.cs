@@ -2,13 +2,10 @@
 
 public abstract class MyBaseDay : BaseDay
 {
-    protected readonly string _input;
+    private string? _input;
+    protected string Input => _input ??= File.ReadAllText(InputFilePath);
 
-    public MyBaseDay()
-    {
-        _input = File.ReadAllText(InputFilePath);
-    }
-    public MyBaseDay(string input)
+    public void SetInput(string input)
     {
         _input = input;
     }

@@ -7,7 +7,7 @@ public class Day06 : MyBaseDay
 {
     public override async ValueTask<string> Solve_1()
     {
-        var lines = _input.Zplit("\n");
+        var lines = Input.Zplit("\n");
         var times = lines[0].Zplit(":")[1].Zplit(" ").ia();
         var distances = lines[1].Zplit(":")[1].Zplit(" ").ia();
 
@@ -44,12 +44,13 @@ public class Day06 : MyBaseDay
 
     public override async ValueTask<string> Solve_2()
     {
-        var lines = _input.Zplit("\n");
+        var lines = Input.Zplit("\n");
         var time = string.Join("", lines[0].Zplit(":")[1].Zplit(" ")).l();
         var distance = string.Join("", lines[1].Zplit(":")[1].Zplit(" ")).l();
 
         long? firstGoodTime = null;
         long? lastGoodTime = null;
+
         for (long j = 0; j < time; j++)
         {
             var myDistance = MyDistance(j, time);
@@ -59,7 +60,7 @@ public class Day06 : MyBaseDay
                 break;
             }
         }
-        for (long j = time - 1; j >=0; j--)
+        for (long j = time - 1; j >= 0; j--)
         {
             var myDistance = MyDistance(j, time);
             if (myDistance > distance)
@@ -68,8 +69,8 @@ public class Day06 : MyBaseDay
                 break;
             }
         }
-
-        var goodTimes = (lastGoodTime - firstGoodTime) + 1;
+        if (lastGoodTime == null || firstGoodTime == null) throw new Exception("lastGoodTime and firstGoodTime expected to not be null at this time");
+        var goodTimes = (lastGoodTime.Value - firstGoodTime.Value) + 1;
         Debug.Assert(goodTimes == 34278221);
         return goodTimes.ToString();
     }

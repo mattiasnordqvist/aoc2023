@@ -9,7 +9,9 @@ internal class Program
         //var s = new Stopwatch();
         //var input = File.ReadAllText(@"C:\Users\mnor\source\repos\aoc2023\AdventOfCode\Inputs\06.txt");
         //s.Start();
-        //await new Day06(input).Solve_2();
+        //var a = new Day06();
+        //a.SetInput(input);
+        //await a.Solve_2();
         //s.Stop();
         //Console.WriteLine(s.Elapsed.TotalMilliseconds.ToString());
         //return;

@@ -6,7 +6,7 @@ public class Day03 : MyBaseDay
 {
     public override async ValueTask<string> Solve_1()
     {
-        var lines = _input.Zplit();
+        var lines = Input.Zplit();
         var nrs = new Dictionary<(int x, int y), (int nr, int length)>();
         var symbols = new HashSet<(int x, int y)>();
         var gears = new HashSet<(int x, int y)>();
@@ -83,7 +83,7 @@ public class Day03 : MyBaseDay
 
     public override async ValueTask<string> Solve_2()
     {
-        var lines = _input.Zplit();
+        var lines = Input.Zplit();
         var nrs = new Dictionary<(int x, int y), (int nr, int length)>();
         var symbols = new HashSet<(int x, int y)>();
         var gears = new HashSet<(int x, int y)>();
