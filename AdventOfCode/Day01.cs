@@ -3,15 +3,15 @@
 namespace AdventOfCode;
 public class Day01 : MyBaseDay
 {
-    public override async ValueTask<string> Solve_1()
+    public override ValueTask<string> Solve_1()
     {
-        var lines = Input.Split('\n');
+        var lines = Input.SplitLines();//Split('\n');
         var sum = 0;
         foreach (var line in lines)
         {
             bool firstFound = false;
             char? last = null;
-            foreach (var c in line)
+            foreach (var c in line.Line)
             {
 
                 if (char.IsDigit(c))
@@ -32,7 +32,7 @@ public class Day01 : MyBaseDay
 
         }
         Debug.Assert(sum == 54601);
-        return sum.ToString();
+        return ValueTask.FromResult(sum.ToString());
     }
 
     public override ValueTask<string> Solve_2()
@@ -49,14 +49,14 @@ public class Day01 : MyBaseDay
             {"eight", 8 },
             {"nine", 9 }
         };
-        var lines = Input.Split('\n');
+        var lines = Input.SplitLines();
         var sum = 0;
         foreach (var line in lines)
         {
-            ReadOnlySpan<char> span = line.AsSpan();
+            ReadOnlySpan<char> span = line;
             bool firstFound = false;
             int? last = null;
-            for (int i = 0; i < line.Length; i++)
+            for (int i = 0; i < line.Line.Length; i++)
             {
                 var c = span[i];
                 if (char.IsDigit(c))

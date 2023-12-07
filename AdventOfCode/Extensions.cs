@@ -1,4 +1,6 @@
-﻿namespace AdventOfCode;
+﻿using System.Text;
+
+namespace AdventOfCode;
 
 public static class Extensions
 {
@@ -11,7 +13,7 @@ public static class Extensions
     public static long l(this string input) => long.Parse(input);
     public static string[] Zplit(this string text, string by = "\n")
     {
-        if(by == "\n")
+        if (by == "\n")
         {
             return text.Split(by, StringSplitOptions.TrimEntries);
         }
@@ -19,6 +21,5 @@ public static class Extensions
         {
             return text.Split(by, StringSplitOptions.TrimEntries | StringSplitOptions.RemoveEmptyEntries);
         }
-        
     }
 }
