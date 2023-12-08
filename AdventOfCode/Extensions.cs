@@ -22,4 +22,9 @@ public static class Extensions
             return text.Split(by, StringSplitOptions.TrimEntries | StringSplitOptions.RemoveEmptyEntries);
         }
     }
+
+    public static T Zplit<T>(this string text, Func<string[], T> f, string by = "\n")
+    {
+        return f(Zplit(text, by));
+    }
 }
