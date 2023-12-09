@@ -18,10 +18,10 @@ public class Day07 : MyBaseDay
             .ToList();
         long totalWinnings = 0;
         var rank = 1;
-        foreach(var strengthGroup in orderedHands)
+        foreach (var strengthGroup in orderedHands)
         {
             var orderedGroup = strengthGroup.OrderByDescending(x => x.Cards, new CardsComparer());
-            foreach(var card in orderedGroup)
+            foreach (var card in orderedGroup)
             {
                 totalWinnings += card.Bid * rank;
                 rank++;
@@ -30,9 +30,9 @@ public class Day07 : MyBaseDay
         Debug.Assert(totalWinnings == 246912307);
         return ValueTask.FromResult(totalWinnings.ToString());
 
-        
+
     }
-    
+
 
     public override ValueTask<string> Solve_2()
     {
@@ -161,24 +161,24 @@ public class Day07 : MyBaseDay
 
         private HandType CalcHand(string cards)
         {
-            var groups = cards.GroupBy(x => x).ToArray();
-            if (groups.Length == 1)
+            var groups = cards.GroupBy(x => x).ToDictionary(x => x.Key, x => x.Count());
+            if (groups.Keys.Count == 1)
             {
                 return HandType.Five;
             }
-            else if (groups.Length == 2 && groups.Any(x => x.Count() == 4))
+            else if (groups.Keys.Count == 2 && groups.Any(x => x.Value == 4))
             {
                 return HandType.Four;
             }
-            else if (groups.Length == 2 && groups.Any(x => x.Count() == 3))
+            else if (groups.Keys.Count == 2 && groups.Any(x => x.Value == 3))
             {
                 return HandType.Full;
             }
-            else if (groups.Length == 3 && groups.Any(x => x.Count() == 3))
+            else if (groups.Keys.Count == 3 && groups.Any(x => x.Value == 3))
             {
                 return HandType.Three;
             }
-            else if (groups.Length == 3)
+            else if (groups.Keys.Count == 3)
             {
                 return HandType.Two;
             }
@@ -190,7 +190,6 @@ public class Day07 : MyBaseDay
             {
                 return HandType.High;
             }
-
         }
         public HandType HandType { get; private set; }
         public string Cards { get; }
