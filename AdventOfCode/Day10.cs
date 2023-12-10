@@ -141,235 +141,54 @@ public class Day10 : MyBaseDay
 
     public override async ValueTask<string> Solve_2()
     {
-        HashSet<(decimal x, decimal y)> nonSquezablePositions = [];
-        
-
-        HashSet<(decimal x, decimal y)> shortCuts = [];
         var map = Input.ToMap();
         var start = map.Where(x => x.Value == 'S').Single().Key;
         var positionsSurroundingStart = start.S4();
         var (pipesConnectingToStart, sChar) = FindConnectingPipes(positionsSurroundingStart, start, map);
         map[start] = sChar;
         Debug.Assert(pipesConnectingToStart.Count() == 2);
+
         var (currentPos, nextPos) = (start, pipesConnectingToStart.First());
-        nonSquezablePositions.Add(Between(currentPos, nextPos));
+
+
         var mainLoop = new Dictionary<P2D, char>() { { currentPos, 'S' } };
+        var outside = new HashSet<P2D>();
         while (true)
         {
+            var dir = nextPos.IsDirectlyAbove(currentPos) ? (0, -1)
+            : nextPos.IsDirectlyBelow(currentPos) ? (0, 1)
+            : nextPos.IsDirectlyToTheLeftOf(currentPos) ? (-1, 0)
+            : (1, 0);
+            outside.Add(currentPos.PoVLeft(currentPos, dir));
+            outside.Add(currentPos.PoVLeft(nextPos, dir));
+
             (currentPos, nextPos) = Move(map, currentPos, nextPos);
-            nonSquezablePositions.Add(Between(currentPos, nextPos));
             mainLoop.Add(currentPos, map[currentPos]);
             if (nextPos == start)
             {
                 break;
             }
         }
-        var maxx = map.Keys.Select(x => x.x).Max();
-        var maxy = map.Keys.Select(x => x.y).Max();
-
-        var emptyCount = map.Values.Where(x => x == ' ').Count();
-        var squeezeEnabled = false;
-        var considerUs = map.ToDictionary();
-        var reconsiderUs = considerUs.ToDictionary();
-        var deemedOutThisRound = new HashSet<P2D>();
-        var deemedOutThisRound2 = new HashSet<(decimal x, decimal y)>();
+        foreach (var p in map)
+        {
+            if (!mainLoop.ContainsKey(p.Key))
+            {
+                map[p.Key] = outside.Contains(p.Key) ? '*' : '.';
+            }
+        }
         while (true)
         {
-            deemedOutThisRound = new HashSet<P2D>();
-            deemedOutThisRound2 = new HashSet<(decimal x, decimal y)>();
-            foreach (var p in considerUs)
+            var foundOne = false;
+            foreach (var p in map.Where(x => x.Value == '*'))
             {
-                if (deemedOutThisRound.Contains(p.Key))
+                foreach (var s in p.Key.S8())
                 {
-                    continue;
-                }
-                if (mainLoop.Keys.Contains(p.Key))
-                    if (mainLoop.Keys.Contains(p.Key))
-                    {
-                        considerUs.Remove(p.Key); continue;
-                    };
-                if (map[p.Key] == ' ')
-                {
-                    considerUs.Remove(p.Key); continue;
-                }
-                if (p.Key.x == 0) { map[p.Key] = ' '; considerUs.Remove(p.Key); continue; }
-                if (p.Key.y == 0) { map[p.Key] = ' '; considerUs.Remove(p.Key); continue; }
-                if (p.Key.x == maxx) { map[p.Key] = ' '; considerUs.Remove(p.Key); continue; }
-                if (p.Key.y == maxy) { map[p.Key] = ' '; considerUs.Remove(p.Key); continue; }
-                if (p.Key.S8().Any(p => map.ContainsKey(p) && map[p] == ' ')) { map[p.Key] = ' '; considerUs.Remove(p.Key); continue; }
-                if (squeezeEnabled)
-                {
-                    var shouldReconsider = false;
-                    var reachedOut = CanReachOut(p.Key, ref shouldReconsider);
-                    if (reachedOut) { map[p.Key] = ' '; considerUs.Remove(p.Key); }
-                    else if (!shouldReconsider) { considerUs.Remove(p.Key); }
+                    if (map.ContainsKey(s) && map[s] == '.') { map[s] = '*'; foundOne = true; }
                 }
             }
-            var newEmptyCount = map.Values.Where(x => x == ' ').Count();
-            if (newEmptyCount == emptyCount && squeezeEnabled) { break; }
-            if (newEmptyCount == emptyCount && !squeezeEnabled) { squeezeEnabled = true; }
-            else
-            {
-                emptyCount = newEmptyCount;
-            }
-        }
-        foreach (var candidate in map.Where(x => x.Value != ' ' && !mainLoop.ContainsKey(x.Key)))
-        {
-            map[candidate.Key] = '.';
+            if (!foundOne) break;
         }
 
-        return map.Values.Where(x => x == '.').Count().ToString();
-
-        bool CanReachOut(P2D p, ref bool shouldReconsider)
-        {
-            var visitedSqueezes = new HashSet<(decimal x, decimal y)>();
-            var surroundingSqueezes = SurroundingSqueezes(p).Except(nonSquezablePositions).ToHashSet();
-            if (surroundingSqueezes.Count == 0) return false;
-            else
-            {
-                foreach (var surroundingSqueeze in surroundingSqueezes)
-                {
-                    if (CanReachOutFromSqueeze(surroundingSqueeze, visitedSqueezes, ref shouldReconsider))
-                    {
-                        return true;
-                    }
-                }
-                deemedOutThisRound.Add(p);
-                return false;
-            }
-        }
-        bool CanReachOutFromSqueeze((decimal x, decimal y) p, HashSet<(decimal x, decimal y)> visited, ref bool shouldReconsider)
-        {
-            if (deemedOutThisRound2.Contains(p))
-            {
-                shouldReconsider = true;
-                return false;
-            }
-            if (shortCuts.Contains(p))
-            {
-                return true;
-            }
-            visited.Add(p);
-            if (SurroundingNormal(p).Any(u => !map.ContainsKey(u) || map[u] == ' '))
-            {
-                shortCuts.Add(p);
-                return true;
-            }
-
-            if (!shouldReconsider && SurroundingNormal(p).Any(u => map.ContainsKey(u) && map[u] == '.'))
-            {
-                shouldReconsider = true;
-            }
-
-            var canReachOutFromSqueeze = false;
-            var a = SurroundingSqueezesFromSqueeze(p)
-                .Except(visited)
-                .Except(nonSquezablePositions).ToList();
-            foreach (var s in a)
-            {
-                if (CanReachOutFromSqueeze(s, visited, ref shouldReconsider))
-                {
-                    canReachOutFromSqueeze = true; break;
-                }
-            }
-            if (canReachOutFromSqueeze)
-            {
-                shortCuts.Add(p);
-                return true;
-            }
-            else
-            {
-                deemedOutThisRound2.Add(p);
-                return false;
-            }
-
-        }
-    }
-
-    
-
-    private HashSet<P2D> SurroundingNormal((decimal x, decimal y) p)
-    {
-        var h = new HashSet<P2D>();
-
-        if (p.x == (int)p.x)
-        {
-            h.Add(new((int)p.x - 1, (int)(p.y + 0.5m)));
-            h.Add(new((int)p.x + 1, (int)(p.y + 0.5m)));
-            h.Add(new((int)p.x - 1, (int)(p.y - 0.5m)));
-            h.Add(new((int)p.x + 1, (int)(p.y - 0.5m)));
-        }
-        else
-        {
-            h.Add(new((int)(p.x + 0.5m), (int)p.y - 1));
-            h.Add(new((int)(p.x + 0.5m), (int)p.y + 1));
-            h.Add(new((int)(p.x - 0.5m), (int)p.y - 1));
-            h.Add(new((int)(p.x - 0.5m), (int)p.y + 1));
-        }
-        return h;
-    }
-
-    private HashSet<(decimal x, decimal y)> SurroundingSqueezesFromSqueeze((decimal x, decimal y) p)
-    {
-        if (p.x == (int)p.x)
-        {
-            return new HashSet<(decimal x, decimal y)>
-            {
-                { (p.x-1, p.y) },
-                { (p.x+1, p.y) },
-                { (p.x-0.5m, p.y-0.5m) },
-                { (p.x-0.5m, p.y+0.5m) },
-                { (p.x+0.5m, p.y-0.5m) },
-                { (p.x+0.5m, p.y+0.5m) }
-            };
-        }
-        else
-        {
-            return new HashSet<(decimal x, decimal y)>
-            {
-                { (p.x, p.y-1) },
-                { (p.x, p.y+1) },
-                { (p.x-0.5m, p.y-0.5m) },
-                { (p.x-0.5m, p.y+0.5m) },
-                { (p.x+0.5m, p.y-0.5m) },
-                { (p.x+0.5m, p.y+0.5m) }
-            };
-        }
-    }
-
-    private HashSet<(decimal x, decimal y)> SurroundingSqueezes(P2D p)
-    {
-        return new HashSet<(decimal x, decimal y)>
-        {
-            { (p.x-0.5m, p.y-1) },
-            { (p.x+0.5m, p.y-1) },
-            { (p.x-0.5m, p.y+1) },
-            { (p.x+0.5m, p.y+1) },
-            { (p.x-1, p.y-0.5m) },
-            { (p.x-1, p.y+0.5m) },
-            { (p.x+1, p.y-0.5m) },
-            { (p.x+1, p.y+0.5m) },
-        };
-    }
-
-    private (decimal x, decimal y) Between(P2D currentPos, P2D nextPos)
-    {
-        if (currentPos.IsDirectlyAbove(nextPos))
-        {
-            return (nextPos.x, nextPos.y - 0.5m);
-        }
-        if (currentPos.IsDirectlyBelow(nextPos))
-        {
-            return (nextPos.x, nextPos.y + 0.5m);
-        }
-        if (currentPos.IsDirectlyToTheLeftOf(nextPos))
-        {
-            return (nextPos.x - 0.5m, nextPos.y);
-        }
-        if (currentPos.IsDirectlyToTheRightOf(nextPos))
-        {
-            return (nextPos.x + 0.5m, nextPos.y);
-        }
-        throw new Exception();
+        return map.Where(x => x.Value == '.').Count().ToString();
     }
 }

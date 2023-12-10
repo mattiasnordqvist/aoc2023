@@ -8,6 +8,14 @@ public record P2D(int x, int y)
     public bool IsDirectlyToTheLeftOf(P2D p) => x == p.x - 1 && y == p.y;
     public bool IsDirectlyToTheRightOf(P2D p) => x == p.x + 1 && y == p.y;
 
+    public P2D PoVLeft(P2D p, (int x, int y) facing) => facing switch
+    {
+        (0, -1) => new P2D(p.x - 1, p.y),
+        (0, 1) => new P2D(p.x + 1, p.y),
+        (-1, 0) => new P2D(p.x, p.y + 1),
+        (1, 0) => new P2D(p.x, p.y - 1),
+    };
+
     public P2D[] S4() => [
        new P2D(x - 1, y),
         new P2D(x + 1, y),
