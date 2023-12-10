@@ -176,11 +176,14 @@ public class Day10 : MyBaseDay
                 map[p.Key] = outside.Contains(p.Key) ? '*' : '.';
             }
         }
+        
+        var considered = new HashSet<P2D>();
         while (true)
         {
             var foundOne = false;
-            foreach (var p in map.Where(x => x.Value == '*'))
+            foreach (var p in map.Where(x => x.Value == '*' && !considered.Contains(x.Key)))
             {
+                considered.Add(p.Key);
                 foreach (var s in p.Key.S8())
                 {
                     if (map.ContainsKey(s) && map[s] == '.') { map[s] = '*'; foundOne = true; }
