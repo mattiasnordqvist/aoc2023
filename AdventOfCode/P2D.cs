@@ -49,4 +49,9 @@ public record P2D(int x, int y)
     {
         return new P2D(x + 1, y);
     }
+
+    public int ManhattanDistance(P2D p2)
+    {
+        return Math.Abs(x - p2.x) + Math.Abs(y - p2.y);
+    }
 }
