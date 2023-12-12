@@ -9,6 +9,10 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <None Remove="Inputs\day12cache.txt" />
+  </ItemGroup>
+
+  <ItemGroup>
     <PackageReference Include="AoCHelper" Version="3.1.0" />
     <PackageReference Include="Spectre.Console" Version="0.48.0" />
   </ItemGroup>
