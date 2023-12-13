@@ -13,7 +13,7 @@ public class Day12 : MyBaseDay
         return s.ToString();
     }
 
-  
+
     public override async ValueTask<string> Solve_2()
     {
         Console.WriteLine("Part 2");
@@ -24,114 +24,97 @@ public class Day12 : MyBaseDay
 
         }).ToList();
 
-        var tasks = lines.Chunk(100)
-            .Select(x => Task.WhenAll(x.Select(y => Task.Run(() => new Line(y).CountArrangements()))));
-        var ss = await Task.WhenAll(tasks);
-        return ss.SelectMany(x => x).Sum().ToString();
+        var s = lines.Select(x => new Line(x).CountArrangements()).Sum();
+        return s.ToString();
+    }
+
+    public static (int[] remainingGroups, string remainingText) Eat(int[] groups, string text)
+    {
+        if(groups.Count() == 0)
+        {
+            return (groups, string.Join("",text.SkipWhile(c => c == '.')));
+        }
+        var nextMatch = new string('#', groups[0]);
+        var span = text.AsSpan();
+        if (span.Length == 0)
+        {
+            return (groups, text);
+        }
+        for (int i = 0; i < span.Length;)
+        {
+            if (span[i] == '.') { i++; continue; }
+            if (span[i] == '?')
+            {
+                return (groups, span[i..].ToString());
+            }
+            if (i + groups[0] > span.Length)
+            {
+                return (groups, span[i..].ToString());
+            }
+            if ((i + groups[0]) == span.Length && span[i..(i + groups[0])].ToString() == nextMatch)
+            {
+                groups = groups[1..];
+
+                i += nextMatch.Length;
+                if (groups.Length == 0)
+                {
+                    return (groups, span[i..].ToString());
+                }
+                nextMatch = new string('#', groups[0]);
+            }
+            else if (i + groups[0] + 1 > span.Length)
+            {
+                return (groups, span[i..].ToString());
+            }
+            else if (span[i..(i + groups[0] + 1)].ToString() == nextMatch + ".")
+            {
+                groups = groups[1..];
+                i += nextMatch.Length + 1;
+                if (groups.Length == 0)
+                {
+                    return (groups, span[i..].ToString());
+                }
+                nextMatch = new string('#', groups[0]);
+            }
+            else
+            {
+                return (groups, span[i..].ToString());
+            }
+        }
+        return (groups, "");
     }
 }
 
 public class Line
 {
     private string _x;
-    private string _springs;
-    private int[] _groupSizes;
-
-    public Dictionary<(string remainingDesiredGroups, string remainingSprings), long> _cache = [];
+    private string _text;
+    private int[] _groups;
 
     public Line(string x)
     {
         _x = x;
-        _springs = x.Zplit(" ")[0];
-        _groupSizes = x.Zplit(" ")[1].Zplit(",").ia();
+        _text = x.Zplit(" ")[0];
+        _groups = x.Zplit(" ")[1].Zplit(",").ia();
     }
     public long CountArrangements()
     {
-        return CountArrangements(_groupSizes, _springs, "");
-        
+        return CountArrangements(_groups, _text);
     }
-
-    private long CountArrangements(int[] groupSizes, string remainingSprings, string accumulated)
+    public long CountArrangements(int[] groups, string text)
     {
-        if (_cache.ContainsKey((string.Join(",", groupSizes), remainingSprings)))
+        var (rG, rT) = Day12.Eat(groups, text);
+        if (rT.Length == 0 && rG.Length > 0) return 0;
+        if (rG.Length == 0 && !rT.Contains('#') && !rT.Contains('?'))
         {
-            return _cache[(string.Join(",", groupSizes), remainingSprings)];
+            return 1;
         }
-        else
+        else if (rT.Contains('?'))
         {
-            long count = AllAlts(groupSizes, groupSizes, remainingSprings, accumulated);
-            return count;
-        }
-    }
+            var i = rT.IndexOf('?');
 
-    private long AllAlts(int[] groupSizes, int[] remainingGroupSizes, string remainingSprings, string accumulated)
-    {
-        
-        var (isCandidate, newRemainingGroupSizes) = IsCandidate(groupSizes, accumulated);
-        
-        if(isCandidate && newRemainingGroupSizes != null)
-        {
-            remainingGroupSizes = newRemainingGroupSizes;
+            return CountArrangements(rG, rT[0..i] + '.' + rT[(i+1)..]) + CountArrangements(rG, rT[0..i] + '#' + rT[(i + 1)..]);
         }
-        if (newRemainingGroupSizes != null && _cache.ContainsKey((string.Join(",", remainingGroupSizes), remainingSprings)))
-        {
-            return _cache[(string.Join(",", remainingGroupSizes), remainingSprings)];
-        }
-        if (!isCandidate)
-        {
-            _cache[(string.Join(",", remainingGroupSizes), remainingSprings)] = 0;
-            return 0;
-        }
-        if (remainingSprings == "")
-        {
-            return IsMatch(accumulated, groupSizes) ? 1 : 0;
-        }
-        if (remainingSprings[0] == '.') { 
-            var a = AllAlts(groupSizes, remainingGroupSizes, remainingSprings[1..], accumulated + ".");
-            //_cache[(string.Join(",", remainingGroupSizes), remainingSprings)] = a;
-            return a;
-        }
-        if (remainingSprings[0] == '#') {
-
-            var a = AllAlts(groupSizes, remainingGroupSizes, remainingSprings[1..], accumulated + "#");
-            return a;
-        }
-        if (remainingSprings[0] == '?') { 
-            var a = AllAlts(groupSizes, remainingGroupSizes, remainingSprings[1..], accumulated + ".") + AllAlts(groupSizes, remainingGroupSizes, remainingSprings[1..], accumulated + "#");
-            return a;
-        }
-        throw new Exception();
-    }
-
-    private (bool, int[]? remainingGroupSizes) IsCandidate(int[] groupSizes, string accumulated)
-    {
-        var groups = accumulated.Zplit(".");
-        if (groups.Length == 0) return (true, groupSizes);
-        if (groups.Count() > groupSizes.Length) return (false, []);
-        var i = 0;
-        for (; i < groups.Count() - 1; i++)
-        {
-            if (groups[i].Length != groupSizes[i]) return (false, []);
-        }
-        if (accumulated.EndsWith("#"))
-        {
-            return (groups[i].Length <= groupSizes[i], null);
-        }
-        else
-        {
-            return (groups[i].Length == groupSizes[i], groupSizes.Skip(i+1).ToArray());
-        }
-
-    }
-
-    public static bool IsMatch(string x, int[] groupSizes)
-    {
-        var groups = x.Zplit(".");
-        if (groups.Count() != groupSizes.Length) return false;
-        for (var i = 0; i < groups.Count(); i++)
-        {
-            if (groups[i].Length != groupSizes[i]) return false;
-        }
-        return true;
+        return 0;
     }
 }
