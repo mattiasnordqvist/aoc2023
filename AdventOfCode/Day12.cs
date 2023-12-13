@@ -10,7 +10,6 @@ public class Day12 : MyBaseDay
 
     public override async ValueTask<string> Solve_2()
     {
-        Console.WriteLine("Part 2");
         var lines = Input.Zplit().Select(x =>
         {
             return x.Split(" ")[0] + "?" + x.Split(" ")[0] + "?" + x.Split(" ")[0] + "?" + x.Split(" ")[0] + "?" + x.Split(" ")[0]
@@ -109,11 +108,20 @@ public class Line
     }
     public long CountArrangements()
     {
-        var a = CountArrangements(_groups, _text);
-        Console.WriteLine(_x + ": " + a);
+        var a = CountArrangementsWithCache(_groups, _text);
         return a;
     }
 
+    private static Dictionary<(string, string), long> _cache = new Dictionary<(string, string), long>();
+    public long CountArrangementsWithCache(int[] groups, string text)
+    {
+        var key = (string.Join(",", groups), text);
+        if (!_cache.ContainsKey(key))
+        {
+            _cache[key] = CountArrangements(groups, text);
+        }
+        return _cache[key];
+    }
     public long CountArrangements(int[] groups, string text)
     {
         if(groups.Count() == 0 && text == "")
@@ -125,26 +133,10 @@ public class Line
         foreach(var kv in d)
         {
             var worth = groups.Length == 1 && kv.Key.Contains('#') ? 0
-                : (groups.Length > 1 ? CountArrangements(groups[1..], kv.Key) : 1);
+                : (groups.Length > 1 ? CountArrangementsWithCache(groups[1..], kv.Key) : 1);
 
             sum += kv.Value * worth;
         }
         return sum;
-
-        //var x = Day12.Eat(groups, text);
-        //var rT = x.RemainingText;
-        //var rG = x.RemainingGroups;
-        //if (rT.Length == 0 && rG.Length > 0) return 0;
-        //if (rG.Length == 0 && -1 == rT.IndexOfAny(['#', '?']))
-        //{
-        //    return 1;
-        //}
-        //else if (rT.Contains('?'))
-        //{
-        //    var i = rT.IndexOf('?');
-
-        //    return CountArrangements(rG, rT[0..i].ToString() + "." + rT[(i + 1)..].ToString()) + CountArrangements(rG, rT[0..i].ToString() + '#' + rT[(i + 1)..].ToString());
-        //}
-        //return 0;
     }
 }
