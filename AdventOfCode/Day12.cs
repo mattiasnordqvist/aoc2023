@@ -26,6 +26,7 @@ public class Day12 : MyBaseDay
     private static Dictionary<string, Dictionary<string, long>> _eatCache = new();
     public static Dictionary<string, long> EatHashtagsWithCache(int amountToEat, string textToEatFrom)
     {
+        textToEatFrom = textToEatFrom.TrimStart('.').TrimEnd('.');
         var key = amountToEat+":"+ textToEatFrom;
         if (!_eatCache.ContainsKey(key))
         {
@@ -128,6 +129,7 @@ public class Line
     private static Dictionary<(string, string), long> _cache = new Dictionary<(string, string), long>();
     public long CountArrangementsWithCache(int[] groups, string text)
     {
+        text = text.TrimStart('.').TrimEnd('.');
         var key = (string.Join(",", groups), text);
         if (!_cache.ContainsKey(key))
         {
