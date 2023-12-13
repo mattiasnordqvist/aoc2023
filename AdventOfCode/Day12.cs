@@ -1,6 +1,4 @@
-﻿using System.Text.RegularExpressions;
-
-namespace AdventOfCode;
+﻿namespace AdventOfCode;
 public class Day12 : MyBaseDay
 {
     public override async ValueTask<string> Solve_1()
