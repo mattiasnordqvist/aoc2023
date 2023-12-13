@@ -1,4 +1,6 @@
-﻿namespace AdventOfCode;
+﻿using System.Text.RegularExpressions;
+
+namespace AdventOfCode;
 public class Day12 : MyBaseDay
 {
     public override async ValueTask<string> Solve_1()
@@ -21,12 +23,23 @@ public class Day12 : MyBaseDay
         return s.ToString();
     }
 
+    private static Dictionary<string, Dictionary<string, long>> _eatCache = new();
+    public static Dictionary<string, long> EatHashtagsWithCache(int amountToEat, string textToEatFrom)
+    {
+        var key = amountToEat+":"+ textToEatFrom;
+        if (!_eatCache.ContainsKey(key))
+        {
+            _eatCache[key] = EatHashtags(amountToEat, textToEatFrom);
+        }
+        return _eatCache[key];
+    }
+
     public static Dictionary<string, long> EatHashtags(int amountToEat, string textToEatFrom)
     {
         textToEatFrom = textToEatFrom.TrimEnd('.').TrimStart('.');
         if (textToEatFrom.Length == amountToEat)
         {
-            if (textToEatFrom.Replace(".", "").Length == amountToEat)
+            if (!textToEatFrom.Contains('.'))
             {
                 return new Dictionary<string, long>()
                 {
@@ -53,7 +66,7 @@ public class Day12 : MyBaseDay
                 {
                     if (candidate[0] == '?')
                     {
-                        return EatHashtags(amountToEat, textToEatFrom[1..]);
+                        return EatHashtagsWithCache(amountToEat, textToEatFrom[1..]);
                     }
                     else { 
                         return new Dictionary<string, long>() { { textToEatFrom, 0 } };
@@ -70,7 +83,7 @@ public class Day12 : MyBaseDay
                         allVariants.AddCount(textToEatFrom[(amountToEat + 1)..].TrimEnd('.').TrimStart('.'), 1);
                         if (textToEatFrom[0] is '?')
                         {
-                            var nextEat = EatHashtags(amountToEat, textToEatFrom[1..]);
+                            var nextEat = EatHashtagsWithCache(amountToEat, textToEatFrom[1..]);
                             foreach (var n in nextEat)
                             {
                                 allVariants.AddCount(n.Key, n.Value);
@@ -79,7 +92,7 @@ public class Day12 : MyBaseDay
                     }
                     if (textToEatFrom[0] is '?' && afterCandidate == '#')
                     {
-                        var nextEat = EatHashtags(amountToEat, textToEatFrom[1..]);
+                        var nextEat = EatHashtagsWithCache(amountToEat, textToEatFrom[1..]);
                         foreach (var n in nextEat)
                         {
                             allVariants.AddCount(n.Key, n.Value);
@@ -128,7 +141,7 @@ public class Line
         {
             return 1;
         }
-        var d = Day12.EatHashtags(groups[0], text).Where(x => x.Value != 0).ToList();
+        var d = Day12.EatHashtagsWithCache(groups[0], text).Where(x => x.Value != 0).ToList();
         var sum = 0l;
         foreach(var kv in d)
         {
