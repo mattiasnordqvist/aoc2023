@@ -22,13 +22,6 @@ public class Day12 : MyBaseDay
         return s.ToString();
     }
 
-    //public ref struct EatResult(int[] remainingGroups, ReadOnlySpan<char> remainingText)
-    //{
-    //    public int[] RemainingGroups { get; } = remainingGroups;
-    //    public ReadOnlySpan<char> RemainingText { get; } = remainingText;
-    //}
-
-
     public static Dictionary<string, long> EatHashtags(int amountToEat, string textToEatFrom)
     {
         textToEatFrom = textToEatFrom.TrimEnd('.').TrimStart('.');
@@ -59,16 +52,33 @@ public class Day12 : MyBaseDay
                 var afterCandidate = textToEatFrom[amountToEat];
                 if (candidate.Contains('.'))
                 {
-                    return new Dictionary<string, long>() { { textToEatFrom, 0 } };
+                    if (candidate[0] == '?')
+                    {
+                        return EatHashtags(amountToEat, textToEatFrom[1..]);
+                    }
+                    else { 
+                        return new Dictionary<string, long>() { { textToEatFrom, 0 } };
+                    }
                 }
                 else if (textToEatFrom[0] is '#' && afterCandidate == '#')
                 {
                     return new Dictionary<string, long>() { { string.Join("", textToEatFrom.SkipWhile(x => x == '#')), 0 } };
                 }
-                else if (afterCandidate == '?' || afterCandidate == '.')
+                else
                 {
-                    allVariants.AddCount(textToEatFrom[(amountToEat)..].TrimEnd('.').TrimStart('.'),1);
-                    if (textToEatFrom[0] is '?')
+                    if (afterCandidate == '?' || afterCandidate == '.')
+                    {
+                        allVariants.AddCount(textToEatFrom[(amountToEat + 1)..].TrimEnd('.').TrimStart('.'), 1);
+                        if (textToEatFrom[0] is '?')
+                        {
+                            var nextEat = EatHashtags(amountToEat, textToEatFrom[1..]);
+                            foreach (var n in nextEat)
+                            {
+                                allVariants.AddCount(n.Key, n.Value);
+                            }
+                        }
+                    }
+                    if (textToEatFrom[0] is '?' && afterCandidate == '#')
                     {
                         var nextEat = EatHashtags(amountToEat, textToEatFrom[1..]);
                         foreach (var n in nextEat)
@@ -76,73 +86,13 @@ public class Day12 : MyBaseDay
                             allVariants.AddCount(n.Key, n.Value);
                         }
                     }
+                    return allVariants;
                 }
-                return allVariants;
             }
             return allVariants;
         }
         throw new Exception();
     }
-
-    //public static EatResult Eat(int[] groups, ReadOnlySpan<char> text)
-    //{
-    //    if (groups.Count() == 0)
-    //    {
-    //        var i = text.IndexOfAnyExcept('.');
-    //        if (i == -1)
-    //        {
-    //            return new(groups, "");
-    //        }
-    //        return new(groups, text[i..]);
-    //    }
-    //    var nextMatch = new string('#', groups[0]);
-    //    if (text.Length == 0)
-    //    {
-    //        return new(groups, text);
-    //    }
-    //    for (int i = 0; i < text.Length;)
-    //    {
-    //        if (text[i] == '.') { i++; continue; }
-    //        if (text[i] == '?')
-    //        {
-    //            return new(groups, text[i..]);
-    //        }
-    //        if (i + groups[0] > text.Length)
-    //        {
-    //            return new(groups, text[i..]);
-    //        }
-    //        if ((i + groups[0]) == text.Length && text[i..(i + groups[0])].ToString() == nextMatch)
-    //        {
-    //            groups = groups[1..];
-
-    //            i += nextMatch.Length;
-    //            if (groups.Length == 0)
-    //            {
-    //                return new(groups, text[i..]);
-    //            }
-    //            nextMatch = new string('#', groups[0]);
-    //        }
-    //        else if (i + groups[0] + 1 > text.Length)
-    //        {
-    //            return new(groups, text[i..]);
-    //        }
-    //        else if (text[i..(i + groups[0] + 1)].ToString() == nextMatch + ".")
-    //        {
-    //            groups = groups[1..];
-    //            i += nextMatch.Length + 1;
-    //            if (groups.Length == 0)
-    //            {
-    //                return new(groups, text[i..]);
-    //            }
-    //            nextMatch = new string('#', groups[0]);
-    //        }
-    //        else
-    //        {
-    //            return new(groups, text[i..]);
-    //        }
-    //    }
-    //    return new(groups, "");
-    //}
 }
 
 public class Line
@@ -166,20 +116,35 @@ public class Line
 
     public long CountArrangements(int[] groups, string text)
     {
-        var x = Day12.Eat(groups, text);
-        var rT = x.RemainingText;
-        var rG = x.RemainingGroups;
-        if (rT.Length == 0 && rG.Length > 0) return 0;
-        if (rG.Length == 0 && -1 == rT.IndexOfAny(['#', '?']))
+        if(groups.Count() == 0 && text == "")
         {
             return 1;
         }
-        else if (rT.Contains('?'))
+        var d = Day12.EatHashtags(groups[0], text).Where(x => x.Value != 0).ToList();
+        var sum = 0l;
+        foreach(var kv in d)
         {
-            var i = rT.IndexOf('?');
+            var worth = groups.Length == 1 && kv.Key.Contains('#') ? 0
+                : (groups.Length > 1 ? CountArrangements(groups[1..], kv.Key) : 1);
 
-            return CountArrangements(rG, rT[0..i].ToString() + "." + rT[(i + 1)..].ToString()) + CountArrangements(rG, rT[0..i].ToString() + '#' + rT[(i + 1)..].ToString());
+            sum += kv.Value * worth;
         }
-        return 0;
+        return sum;
+
+        //var x = Day12.Eat(groups, text);
+        //var rT = x.RemainingText;
+        //var rG = x.RemainingGroups;
+        //if (rT.Length == 0 && rG.Length > 0) return 0;
+        //if (rG.Length == 0 && -1 == rT.IndexOfAny(['#', '?']))
+        //{
+        //    return 1;
+        //}
+        //else if (rT.Contains('?'))
+        //{
+        //    var i = rT.IndexOf('?');
+
+        //    return CountArrangements(rG, rT[0..i].ToString() + "." + rT[(i + 1)..].ToString()) + CountArrangements(rG, rT[0..i].ToString() + '#' + rT[(i + 1)..].ToString());
+        //}
+        //return 0;
     }
 }

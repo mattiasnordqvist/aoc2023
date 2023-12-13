@@ -8,34 +8,6 @@ namespace Tests;
 
 public class Day12Tests
 {
-    //[Theory]
-    //[InlineData("1,1,3", "#.#.###", "", "")]
-    //[InlineData("1,1,3,2", "#.#.###", "2", "")]
-    //[InlineData("2", "", "2", "")]
-    //[InlineData("1,1", "#.#", "", "")]
-    //[InlineData("1", ".", "1", "")]
-    //[InlineData("1,1,3", "#.#.###.", "", "")]
-    //[InlineData("2,1,3", "#.#.###", "2,1,3", "#.#.###")]
-    //[InlineData("1,2,3", "#.#.###", "2,3", "#.###")]
-    //[InlineData("1,1,3", "....###", "1,1,3", "###")]
-    //[InlineData("1,1,3", ".#...#....###.", "", "")]
-    //[InlineData("1,1,3", "???.###", "1,1,3", "???.###")]
-    //[InlineData("1,1,3", ".??..??...?##.", "1,1,3", "??..??...?##.")]
-    //[InlineData("1,1,3", ".#..??...?##.", "1,3", "??...?##.")]
-    //[InlineData("2,1,3", ".#..??...?##.", "2,1,3", "#..??...?##.")]
-    //[InlineData("2,1,3", "##..#...###.", "", "")]
-    //[InlineData("2,1,3", "##..#...?##.", "3", "?##.")]
-    //[InlineData("3", ".##.", "3", "##.")]
-    //[InlineData("3", "###.", "", "")]
-    //[InlineData("3", "#", "3", "#")]
-    //[InlineData("", ".", "", "")]
-    //public void EatTests(string groups, string text, string remainingGroups, string remainingText)
-    //{
-    //    var x = Day12.Eat(groups.Zplit(",").ia(), text);
-    //    string.Join(",", x.RemainingGroups).Should().Be(remainingGroups);
-    //    x.RemainingText.ToString().Should().Be(remainingText);
-    //}
-
     [Theory]
     [InlineData(1, "#",":1")]
     [InlineData(1, "?",":1")]
@@ -55,12 +27,15 @@ public class Day12Tests
     [InlineData(1, ".?.?", "?:1", ":1")]
     [InlineData(2, ".?.?", "")]
     [InlineData(2, ".?.?.", "")]
-    [InlineData(1, "???.###", "###:1", "??.###:1", "?.###:1")]
+    [InlineData(1, "???.###","?.###:1", "###:2")]
 
     [InlineData(1, "###", "")]
-    [InlineData(1, "??.###", "###:1", "?.###:1")]
+    [InlineData(1, "??.###", "###:2")]
     [InlineData(1, "?.###", "###:1")]
     [InlineData(3, "###", ":1")]
+    [InlineData(6, "??.######..#####", "#####:1")]
+    [InlineData(6, "?.######..#####", "#####:1")]
+    [InlineData(5, "#####", ":1")]
     public void EatHashTagsTests(int amountToEat, string input, params string[] expected)
     {
         var x = Day12.EatHashtags(amountToEat, input);
@@ -87,7 +62,6 @@ public class Day12Tests
     [InlineData(".# 2",0)]
     [InlineData("#. 2",0)]
     [InlineData("## 2",1)]
-
     [InlineData("#? 1", 1)]
     [InlineData("?# 1", 1)]
     [InlineData("??? 1", 3)]
@@ -133,5 +107,44 @@ public class Day12Tests
     {
         var a = new Line("?###???????? 3,2,1");
         a.CountArrangements().Should().Be(10);
+    }
+
+    [Theory]
+    [InlineData("?#.?..?.##.###? 2,1,2,3",2)]
+    [InlineData("??????##?.? 2,5,1",3)]
+    [InlineData("??????##? 2,5", 3)]
+    [InlineData("????#??.##????? 1,3,7",6)]
+    [InlineData("?????#??? 3", 3)]
+    [InlineData("?????#?? 3", 3)]
+    [InlineData("?????#? 3", 2)]
+    [InlineData("????#??? 3", 3)]
+    [InlineData("???#??? 3", 3)]
+    [InlineData("??#??? 3", 3)]
+    [InlineData("?#??? 3", 2)]
+    [InlineData("????????#??? 2,3",15)]
+    [InlineData("??? 2", 2)]
+    [InlineData("?#? 2", 2)]
+    [InlineData("?#?? 2", 2)]
+    [InlineData("??#? 2", 2)]
+    [InlineData("???? 2", 3)]
+    [InlineData("???? 2,1", 1)]
+    [InlineData("??#? 2,1", 0)]
+    [InlineData("??##? 2,1", 0)]
+    [InlineData("??##?? 2,1", 1)]
+    [InlineData("??##?? 1,2", 1)]
+    [InlineData("???#?? 1,2", 3)]
+    [InlineData("????#? 1,2", 5)]
+    [InlineData("???#? 1,2", 3)]
+    [InlineData("???#? 1,3", 1)]
+    [InlineData("??##? 1,3", 1)]
+    [InlineData("???## 1,3", 1)]
+    [InlineData("???#? 2,3", 0)]
+    [InlineData("????#? 2,3", 1)]
+    [InlineData("?????#? 2,3", 3)]
+    [InlineData("????????#????????????#????????????#????????????#????????????#??? 2,3,2,3,2,3,2,3,2,3",7870477)]
+    public void Input(string input, int arrangements)
+    {
+        var a = new Line(input);
+        a.CountArrangements().Should().Be(arrangements);
     }
 }
