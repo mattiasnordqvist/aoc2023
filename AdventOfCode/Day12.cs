@@ -35,7 +35,12 @@ public class Day12 : MyBaseDay
     {
         if(groups.Count() == 0)
         {
-            return (groups, string.Join("",text.SkipWhile(c => c == '.')));
+            var i = text.AsSpan().IndexOfAnyExcept('.');
+            if(i == -1)
+            {
+                return (groups, "");
+            }
+            return (groups,  text.AsSpan().Slice(i).ToString());
         }
         var nextMatch = new string('#', groups[0]);
         var span = text.AsSpan();
