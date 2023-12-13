@@ -31,7 +31,7 @@ public class Day12Tests
     [InlineData("", ".", "", "")]
     public void EatTests(string groups, string text, string remainingGroups, string remainingText)
     {
-        var (remG, remT) = Day12.Eat(groups.Zplit(",").ia(), text);
+        var (remG, remT) = Day12.EatWithCache(groups.Zplit(",").ia(), text);
         string.Join(",", remG).Should().Be(remainingGroups);
         remT.Should().Be(remainingText);
     }

@@ -1,18 +1,12 @@
-﻿
-
-
-namespace AdventOfCode;
+﻿namespace AdventOfCode;
 public class Day12 : MyBaseDay
 {
-    public static int _completed = 0;
-
     public override async ValueTask<string> Solve_1()
     {
         var lines = Input.Zplit();
         var s = lines.Select(x => new Line(x).CountArrangements()).Sum();
         return s.ToString();
     }
-
 
     public override async ValueTask<string> Solve_2()
     {
@@ -27,7 +21,16 @@ public class Day12 : MyBaseDay
         var s = lines.Select(x => new Line(x).CountArrangements()).Sum();
         return s.ToString();
     }
-
+    public static Dictionary<(string,string), (int[], string)> _eatCache = new();
+    public static (int[] remainingGroups, string remainingText) EatWithCache(int[] groups, string text)
+    {
+        var key = (string.Join(",", groups), text);
+        if (!_eatCache.ContainsKey(key))
+        {
+            _eatCache[key] = Eat(groups, text);
+        }
+         return _eatCache[key];
+    }
     public static (int[] remainingGroups, string remainingText) Eat(int[] groups, string text)
     {
         if(groups.Count() == 0)
@@ -99,11 +102,22 @@ public class Line
     }
     public long CountArrangements()
     {
-        return CountArrangements(_groups, _text);
+        return CountArrangementsWithCache(_groups, _text);
+    }
+    public static Dictionary<(string, string), long> _countCache = new();
+
+    public long CountArrangementsWithCache(int[] groups, string text)
+    {
+        var key = (string.Join(",", groups), text);
+        if (!_countCache.ContainsKey(key))
+        {
+            _countCache[key] = CountArrangements(groups, text);
+        }
+        return _countCache[key];
     }
     public long CountArrangements(int[] groups, string text)
     {
-        var (rG, rT) = Day12.Eat(groups, text);
+        var (rG, rT) = Day12.EatWithCache(groups, text);
         if (rT.Length == 0 && rG.Length > 0) return 0;
         if (rG.Length == 0 && !rT.Contains('#') && !rT.Contains('?'))
         {
@@ -113,7 +127,7 @@ public class Line
         {
             var i = rT.IndexOf('?');
 
-            return CountArrangements(rG, rT[0..i] + '.' + rT[(i+1)..]) + CountArrangements(rG, rT[0..i] + '#' + rT[(i + 1)..]);
+            return CountArrangementsWithCache(rG, rT[0..i] + '.' + rT[(i+1)..]) + CountArrangementsWithCache(rG, rT[0..i] + '#' + rT[(i + 1)..]);
         }
         return 0;
     }
