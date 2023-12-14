@@ -6,9 +6,14 @@ public class Day04 : MyBaseDay
 {
     public record Card(int nr, int matching);
 
-    public override ValueTask<string> Solve_1()
+    public override async ValueTask<string> Solve_1()
     {
-        throw new NotImplementedException();
+        return Input.Zplit()
+            .Select(x => x.Zplit(":")[1])
+            .Select(x => (winning: x.Zplit("|")[0].Zplit(" ").ToHashSet(), mycards: x.Zplit("|")[1].Zplit(" ").ToHashSet()))
+            .Select(x => x.winning.Intersect(x.mycards).Count())
+            .Sum(x => x == 1 ? 1 : (int)Math.Pow(2, x-1))
+            .ToString();
     }
 
     public override ValueTask<string> Solve_2()
