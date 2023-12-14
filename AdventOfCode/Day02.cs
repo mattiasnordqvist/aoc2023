@@ -4,19 +4,17 @@ namespace AdventOfCode;
 
 public class Day02 : MyBaseDay
 {
-    public override async ValueTask<string> Solve_1()
-    {
-        return Input.Zplit()
+    public override async ValueTask<string> Solve_1() =>
+        Input.Zplit()
             .Where(x => IsPossible(x))
             .Sum(x => Id(x)).ToString();
-
-    }
 
     private bool IsPossible(string line)
     {
         // 12 red cubes, 13 green cubes, and 14 blue
-        return !line[(line.IndexOf(":")+1)..].Replace(";", ",")
-            .Zplit(",")
+        return !line[(line.IndexOf(":")+1)..]
+            .Zplit(";")
+            .SelectMany(x => x.Zplit(","))
             .Any(x => ((x.Zplit(" ")[0].i() > 12 && x.Zplit(" ")[1] == "red")
             || (x.Zplit(" ")[0].i() > 13 && x.Zplit(" ")[1] == "green")
             || (x.Zplit(" ")[0].i() > 14 && x.Zplit(" ")[1] == "blue")));
@@ -25,8 +23,9 @@ public class Day02 : MyBaseDay
     private int Power(string line)
     {
         // 12 red cubes, 13 green cubes, and 14 blue
-        return line[(line.IndexOf(":") + 1)..].Replace(";", ",")
-            .Zplit(",")
+        return line[(line.IndexOf(":") + 1)..]
+            .Zplit(";")
+            .SelectMany(x => x.Zplit(","))
             .Select(x => (amount: x.Zplit(" ")[0].i(), color: x.Zplit(" ")[1]))
             .GroupBy(x => x.color)
             .Select(x => x.Max(m => m.amount))
