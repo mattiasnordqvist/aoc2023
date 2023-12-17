@@ -44,4 +44,22 @@ public static class MapExtensions
         }
         return map;
     }
+
+    public static Dictionary<(int x, int y), char> ToMap2(this string input)
+    {
+        var lines = input.Zplit();
+        var map = new Dictionary<(int x, int y), char>();
+        var y = 0;
+        foreach (var line in lines)
+        {
+            var x = 0;
+            foreach (var c in line)
+            {
+                map.Add((x, y), c);
+                x++;
+            }
+            y++;
+        }
+        return map;
+    }
 }

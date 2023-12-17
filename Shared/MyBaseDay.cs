@@ -1,4 +1,6 @@
-﻿namespace AdventOfCode;
+﻿using AoCHelper;
+
+namespace AdventOfCode;
 
 public abstract class MyBaseDay : BaseDay
 {
