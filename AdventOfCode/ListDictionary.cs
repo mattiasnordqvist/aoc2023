@@ -29,3 +29,20 @@ public class ListDictionary<TKey, TValue> : Dictionary<TKey, List<TValue>>
         }
     }
 }
+
+
+public class SortedListDictionary<TKey, TValue> : Dictionary<TKey, SortedList<TValue, TValue>>
+{
+    public void Add(TKey key, TValue value)
+    {
+        if (TryGetValue(key, out var list))
+        {
+            list.Add(value,value);
+        }
+        else
+        {
+            Add(key, []);
+            this[key].Add(value, value);
+        }
+    }
+}

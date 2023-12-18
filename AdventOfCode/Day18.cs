@@ -93,10 +93,11 @@ public class Day18 : MyBaseDay
     public override async ValueTask<string> Solve_2()
     {
         var map2 = new ListDictionary<long, long>();
+        var xranges = new ListDictionary<long, (long s, long e)>();
         var p = (x: 0, y: 0);
-        map2.Add(0, 0);
-        foreach (var instr in _instructions)
+        for (int i = 0; i < _instructions.Count; i++)
         {
+            (char d, int s, string c) instr = _instructions[i];
             var (dx, dy) = instr.c[5] switch
             {
                 '0' => (1, 0),
@@ -105,33 +106,103 @@ public class Day18 : MyBaseDay
                 '1' => (0, 1)
             };
 
-            for (int s = 0; s < FromHex(instr.c[0..5]); s++)
+            long? xstart = null;
+            long? xend = null;
+            var fromHex = FromHex(instr.c[0..5]);
+            for (int s = 0; s < fromHex; s++)
             {
+                xstart ??= p.x;
                 p.x += dx;
                 p.y += dy;
+                xend = p.x;
                 map2.Add(p.y, p.x);
+                if(dy != 0 && s < fromHex-1) { 
+                xranges.Add(p.y, (s: xstart!.Value, e: xend!.Value));
+                }
+            }
+            if(dx != 0)
+            {
+                xranges.Add(p.y, (s: xstart!.Value, e: xend!.Value));
             }
         }
 
         var miny2 = map2.Min(c => c.Key);
         var maxy2 = map2.Max(c => c.Key);
-        var l = 0l;
-        for (int y = miny; y <= maxy; y++)
+        var l = 0L;
+        for (long y = miny2; y <= maxy2; y++)
         {
-            var ranges = GetRanges(map2[y]);
-            if(ranges.Count() == 1)
-            {
-                l += ranges[0].last - ranges[0].start;
+            if (y == 356353) { 
+            Console.WriteLine(y);
             }
-            else
+            if (y == 56407)
             {
-                for(int r = 0; r < ranges.Count() / 2; r++)
+                Console.WriteLine(y);
+            }
+            var ranges = xranges[y].OrderBy(c => c.s).ToList();
+            for (int r = 0; r < ranges.Count;)
+            {
+                if (ranges[r].s != ranges[r].e && ((map2.ContainsKey(y - 1) && map2[y - 1].Contains(ranges[r].s) && map2[y - 1].Contains(ranges[r].e))
+                    || (map2.ContainsKey(y + 1) && map2[y + 1].Contains(ranges[r].s) && map2[y + 1].Contains(ranges[r].e))))
                 {
-                    var from = ranges[r*2];
-                    var to = ranges[r*2+1];
-                    l += (to.last - from.start);
+                    //single range
+                    l += (ranges[r].e - ranges[r].s) + 1;
+                    r++;
+                }
+                else
+                {
+                    var from = ranges[r];
+                    var i = 1;
+                    var to = ranges[(r + i)];
+                    while (to.s != to.e)
+                    {
+                        i++;
+                        to = ranges[(r + i)];
+                    }
+                    l += (to.e - from.s) + 1;
+                    r += (1 + i);
                 }
             }
+
+
+            //var ranges = GetRanges(map2[y]);
+
+            //for (int r = 0; r < ranges.Length;)
+            //{
+            //    if (ranges[r].start != ranges[r].last  && ((map2.ContainsKey(y - 1) && map2[y - 1].Contains(ranges[r].start) && map2[y - 1].Contains(ranges[r].last))
+            //        || (map2.ContainsKey(y + 1) && map2[y + 1].Contains(ranges[r].start) && map2[y + 1].Contains(ranges[r].last))))
+            //    {
+            //        //single range
+            //        l += (ranges[r].last - ranges[r].start) + 1;
+            //        r++;
+            //    }
+            //    else
+            //    {
+            //        var from = ranges[r];
+            //        var i = 1;
+            //        var to = ranges[(r + i)];
+            //        while(to.start != to.last)
+            //        {
+            //            i++;
+            //            to = ranges[(r + i)];
+            //        }
+            //        l += (to.last - from.start) + 1;
+            //        r += (1+i);
+            //    }
+            //}
+
+            //if (ranges.Count() == 1)
+            //{
+            //    l += (ranges[0].last - ranges[0].start) + 1;
+            //}
+            //else
+            //{
+            //    for (int r = 0; r < ranges.Length / 2; r++)
+            //    {
+            //        var from = ranges[r * 2];
+            //        var to = ranges[r * 2 + 1];
+            //        l += (to.last - from.start) + 1;
+            //    }
+            //}
         }
         return l.ToString();
     }
@@ -142,23 +213,25 @@ public class Day18 : MyBaseDay
 
         long? start = null;
         long? last = null;
-        foreach(var x in list)
+        var ordered = list.Order();
+        foreach (var x in ordered)
         {
-            if(start == null) { start = x; last = x; }
-            else if(x == last + 1) { last = x; }
-            else { ranges.Add((start.Value, last.Value));  start = x; last = x; }
+            if (start == null) { start = x; last = x; }
+            else if(x == last) { continue; }
+            else if (x == last + 1) { last = x; }
+            else { ranges.Add((start.Value, last.Value)); start = x; last = x; }
         }
         ranges.Add((start.Value, last.Value));
         return [.. ranges];
     }
 
-    private long FromHex(string hex)
+    private static long FromHex(string hex)
     {
         return hex.Reverse().Aggregate((place: 0, acc: 0), (a, b) => (place: a.place + 1, acc: a.acc + (b switch
         {
             >= '0' and <= '9' => b - 48,
             >= 'a' => b - 87,
 
-        }) * (int)Math.Pow(16,a.place))).acc;
+        }) * (int) Math.Pow(16, a.place))).acc;
     }
 }
