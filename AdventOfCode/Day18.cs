@@ -116,11 +116,12 @@ public class Day18 : MyBaseDay
                 p.y += dy;
                 xend = p.x;
                 map2.Add(p.y, p.x);
-                if(dy != 0 && s < fromHex-1) { 
-                xranges.Add(p.y, (s: xstart!.Value, e: xend!.Value));
+                if (dy != 0 && s < fromHex - 1)
+                {
+                    xranges.Add(p.y, (s: xstart!.Value, e: xend!.Value));
                 }
             }
-            if(dx != 0)
+            if (dx != 0)
             {
                 xranges.Add(p.y, (s: xstart!.Value, e: xend!.Value));
             }
@@ -131,18 +132,10 @@ public class Day18 : MyBaseDay
         var l = 0L;
         for (long y = miny2; y <= maxy2; y++)
         {
-            if (y == 356353) { 
-            Console.WriteLine(y);
-            }
-            if (y == 56407)
-            {
-                Console.WriteLine(y);
-            }
             var ranges = xranges[y].OrderBy(c => c.s).ToList();
             for (int r = 0; r < ranges.Count;)
             {
-                if (ranges[r].s != ranges[r].e && ((map2.ContainsKey(y - 1) && map2[y - 1].Contains(ranges[r].s) && map2[y - 1].Contains(ranges[r].e))
-                    || (map2.ContainsKey(y + 1) && map2[y + 1].Contains(ranges[r].s) && map2[y + 1].Contains(ranges[r].e))))
+                if (IsUTurn(r, y))
                 {
                     //single range
                     l += (ranges[r].e - ranges[r].s) + 1;
@@ -152,17 +145,22 @@ public class Day18 : MyBaseDay
                 {
                     var from = ranges[r];
                     var i = 1;
-                    var to = ranges[(r + i)];
-                    while (to.s != to.e)
+                    var to = ranges[r + i];
+                    while (IsUTurn(r + i, y))
                     {
                         i++;
-                        to = ranges[(r + i)];
+                        to = ranges[r + i];
                     }
                     l += (to.e - from.s) + 1;
                     r += (1 + i);
                 }
             }
 
+            bool IsUTurn(int r, long y)
+            {
+                return ranges[r].s != ranges[r].e && ((map2.ContainsKey(y - 1) && map2[y - 1].Contains(ranges[r].s) && map2[y - 1].Contains(ranges[r].e))
+                    || (map2.ContainsKey(y + 1) && map2[y + 1].Contains(ranges[r].s) && map2[y + 1].Contains(ranges[r].e)));
+            }
 
             //var ranges = GetRanges(map2[y]);
 
@@ -217,7 +215,7 @@ public class Day18 : MyBaseDay
         foreach (var x in ordered)
         {
             if (start == null) { start = x; last = x; }
-            else if(x == last) { continue; }
+            else if (x == last) { continue; }
             else if (x == last + 1) { last = x; }
             else { ranges.Add((start.Value, last.Value)); start = x; last = x; }
         }
@@ -232,6 +230,6 @@ public class Day18 : MyBaseDay
             >= '0' and <= '9' => b - 48,
             >= 'a' => b - 87,
 
-        }) * (int) Math.Pow(16, a.place))).acc;
+        }) * (int)Math.Pow(16, a.place))).acc;
     }
 }
