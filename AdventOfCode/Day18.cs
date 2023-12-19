@@ -123,7 +123,7 @@ public class Day18 : MyBaseDay
             }
             if (dx != 0)
             {
-                xranges.Add(p.y, (s: xstart!.Value, e: xend!.Value));
+                xranges.Add(p.y, (s: Math.Min(xstart!.Value, xend!.Value), e: Math.Max(xstart!.Value, xend!.Value)));
             }
         }
 
