@@ -3,11 +3,7 @@ namespace AdventOfCode;
 public class Day18 : MyBaseDay
 {
     private List<(char d, int s, string c)> _instructions = new List<(char, int, string)>();
-    private HashSet<(int x, int y)> map;
-    private int minx;
-    private int maxx;
-    private int miny;
-    private int maxy;
+  
 
     public Day18()
     {
@@ -22,6 +18,11 @@ public class Day18 : MyBaseDay
 
     public override async ValueTask<string> Solve_1()
     {
+        HashSet<(int x, int y)> map;
+        int minx;
+        int maxx;
+        int miny;
+        int maxy;
         map = [];
         var p = (x: 0, y: 0);
         map.Add(p);
@@ -161,46 +162,6 @@ public class Day18 : MyBaseDay
                 return ranges[r].s != ranges[r].e && ((map2.ContainsKey(y - 1) && map2[y - 1].Contains(ranges[r].s) && map2[y - 1].Contains(ranges[r].e))
                     || (map2.ContainsKey(y + 1) && map2[y + 1].Contains(ranges[r].s) && map2[y + 1].Contains(ranges[r].e)));
             }
-
-            //var ranges = GetRanges(map2[y]);
-
-            //for (int r = 0; r < ranges.Length;)
-            //{
-            //    if (ranges[r].start != ranges[r].last  && ((map2.ContainsKey(y - 1) && map2[y - 1].Contains(ranges[r].start) && map2[y - 1].Contains(ranges[r].last))
-            //        || (map2.ContainsKey(y + 1) && map2[y + 1].Contains(ranges[r].start) && map2[y + 1].Contains(ranges[r].last))))
-            //    {
-            //        //single range
-            //        l += (ranges[r].last - ranges[r].start) + 1;
-            //        r++;
-            //    }
-            //    else
-            //    {
-            //        var from = ranges[r];
-            //        var i = 1;
-            //        var to = ranges[(r + i)];
-            //        while(to.start != to.last)
-            //        {
-            //            i++;
-            //            to = ranges[(r + i)];
-            //        }
-            //        l += (to.last - from.start) + 1;
-            //        r += (1+i);
-            //    }
-            //}
-
-            //if (ranges.Count() == 1)
-            //{
-            //    l += (ranges[0].last - ranges[0].start) + 1;
-            //}
-            //else
-            //{
-            //    for (int r = 0; r < ranges.Length / 2; r++)
-            //    {
-            //        var from = ranges[r * 2];
-            //        var to = ranges[r * 2 + 1];
-            //        l += (to.last - from.start) + 1;
-            //    }
-            //}
         }
         return l.ToString();
     }
